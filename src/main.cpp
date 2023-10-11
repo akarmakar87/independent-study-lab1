@@ -9,6 +9,8 @@ const int LOOP_DELAY_MILLIS = 5; // Wait for 0.005s between motor updates.
 const float m1_offset = 0.0;
 const float m2_offset = 0.0;
 
+float prevError = 0.0;
+
 // Step 5. Implement your own PD controller here.
 float pd_control(float pos,
                  float vel,
@@ -16,7 +18,33 @@ float pd_control(float pos,
                  float Kp,
                  float Kd)
 {
-  return 0.0; // YOUR CODE HERE
+  // ORIENTATION: 0 TO 360 
+  // -0.70 (leaning on hip bracket)
+  // 1.62 (touching table)
+  // 0.46 (halfway)
+
+  float current = 0.0;
+  float error = target - pos;
+  float bias = 450;
+
+  if (abs(error) > 0.01) {
+    float deriv = (error - prevError) / 0.005; // 0.005 seconds 
+    current = (error * Kp) + (deriv * Kd);
+    if (current < 0) {
+      current -= bias;
+    } else {
+      current += bias;
+    }
+    Serial.println(target);
+    Serial.println(pos);
+    Serial.println(error);
+    Serial.println(current);
+    Serial.println(deriv);
+  }
+
+  prevError = error;
+
+  return current;
 }
 
 void sanitize_current_command(float &command,
@@ -103,9 +131,9 @@ void loop()
     // float time = millis() / 1000.0; // millis() returns the time in milliseconds since start of program
 
     // Step 5. Your PD controller is run here.
-    float Kp = 1000.0;
-    float Kd = 0;
-    float target_position = 0.0; // modify in step 8
+    float Kp = 1000;
+    float Kd = 100;
+    float target_position = 0.46; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
     // Step 4. Uncomment for bang-bang control. Comment out again before Step 5.
@@ -114,7 +142,6 @@ void loop()
     // } else {
     //   m0_current = -800;
     // }
-
     // Step 10. Program periodic motion for all three motors.
 
     // Step 9. Program PID control for the two other motors.
@@ -122,14 +149,14 @@ void loop()
     float m1_vel = bus.Get(1).Velocity();
     float m2_pos = bus.Get(2).Position();
     float m2_vel = bus.Get(2).Velocity();
-    Serial.print("\tm1_pos: ");
-    Serial.print(m1_pos);
-    Serial.print("\tm1_vel: ");
-    Serial.print(m1_vel);
-    Serial.print("\tm2_pos: ");
-    Serial.print(m2_pos);
-    Serial.print("\tm2_vel: ");
-    Serial.print(m2_vel);
+    // Serial.print("\tm1_pos: ");
+    // Serial.print(m1_pos);
+    // Serial.print("\tm1_vel: ");
+    // Serial.print(m1_vel);
+    // Serial.print("\tm2_pos: ");
+    // Serial.print(m2_pos);
+    // Serial.print("\tm2_vel: ");
+    // Serial.print(m2_vel);
     // m1_current = YOUR PID CODE
     // m2_current = YOUR PID CODE
 
