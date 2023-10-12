@@ -18,33 +18,26 @@ float pd_control(float pos,
                  float Kp,
                  float Kd)
 {
-  // ORIENTATION: 0 TO 360 
-  // -0.70 (leaning on hip bracket)
-  // 1.62 (touching table)
-  // 0.46 (halfway)
+
+  // 0.09 (lower leg leaning on hip bracket)
+  // 2.32 (lower leg touching table)
+  // 1.0 (about halfway)
 
   float current = 0.0;
   float error = target - pos;
   float bias = 450;
 
   if (abs(error) > 0.005) {
-    float deriv = (error - prevError) / 0.005; // 0.005 seconds 
+    float deriv = (error - prevError) / 0.005; // 5 millisecond intervals
     current = (error * Kp) + (deriv * Kd);
     if (current < 0) {
       current -= bias;
     } else {
       current += bias;
     }
-    Serial.println("new pd loop");
-    Serial.println(target);
-    Serial.println(pos);
-    Serial.println(error);
-    Serial.println(current);
-    Serial.println(deriv);
   }
 
   prevError = error;
-
   return current;
 }
 
