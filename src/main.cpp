@@ -27,7 +27,7 @@ float pd_control(float pos,
   float error = target - pos;
   float bias = 450;
 
-  if (abs(error) > 0.01) {
+  if (abs(error) > 0.005) {
     float deriv = (error - prevError) / 0.005; // 0.005 seconds 
     current = (error * Kp) + (deriv * Kd);
     if (current < 0) {
@@ -35,6 +35,7 @@ float pd_control(float pos,
     } else {
       current += bias;
     }
+    Serial.println("new pd loop");
     Serial.println(target);
     Serial.println(pos);
     Serial.println(error);
@@ -133,7 +134,7 @@ void loop()
     // Step 5. Your PD controller is run here.
     float Kp = 1000;
     float Kd = 100;
-    float target_position = 0.46; // modify in step 8
+    float target_position = 1.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
     // Step 4. Uncomment for bang-bang control. Comment out again before Step 5.
