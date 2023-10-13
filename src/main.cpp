@@ -9,6 +9,7 @@ const int LOOP_DELAY_MILLIS = 5; // Wait for 0.005s between motor updates.
 const float m1_offset = 0.0;
 const float m2_offset = 0.0;
 
+// store the error from previous loop iteration
 float prevError = 0.0;
 
 // Step 5. Implement your own PD controller here.
@@ -18,26 +19,37 @@ float pd_control(float pos,
                  float Kp,
                  float Kd)
 {
-
+  // MOTOR POS VALUES:
   // 0.09 (lower leg leaning on hip bracket)
   // 2.32 (lower leg touching table)
-  // 1.0 (about halfway)
+  // 1.0  (about halfway)
 
   float current = 0.0;
   float error = target - pos;
-  float bias = 450;
 
+  // approximately the minimum power required to make the motor move at all
+  float bias = 450; 
+
+  // allowed error of 0.005 to prevent motor from oscillating forever while 
+  // trying to reach the EXACT target position
   if (abs(error) > 0.005) {
+
+    // NOTE: prevError declared as a global variable
     float deriv = (error - prevError) / 0.005; // 5 millisecond intervals
     current = (error * Kp) + (deriv * Kd);
+
+    // add or subtract bias according to current
     if (current < 0) {
       current -= bias;
     } else {
       current += bias;
     }
+
   }
 
+  // update prevError
   prevError = error;
+
   return current;
 }
 
@@ -125,8 +137,8 @@ void loop()
     // float time = millis() / 1000.0; // millis() returns the time in milliseconds since start of program
 
     // Step 5. Your PD controller is run here.
-    float Kp = 1000;
-    float Kd = 100;
+    float Kp = 1000; // critically damped
+    float Kd = 100;  // using motor between lower leg and upper leg
     float target_position = 1.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
