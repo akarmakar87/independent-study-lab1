@@ -139,7 +139,7 @@ void loop()
     // Step 5. Your PD controller is run here.
     float Kp = 1000; // critically damped
     float Kd = 100;  // using motor between lower leg and upper leg
-    float target_position = 1.0; // modify in step 8
+    float target_position = 0.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
     // Step 4. Uncomment for bang-bang control. Comment out again before Step 5.
